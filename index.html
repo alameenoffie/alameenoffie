@@ -82,7 +82,7 @@
 
         // قراءة ملف Excel تلقائيًا من السيرفر
         window.onload = () => {
-            fetch('data1.xlsx')
+            fetch('data.xlsx?v=20231103')
                 .then(response => response.arrayBuffer())
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
