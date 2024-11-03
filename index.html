@@ -80,16 +80,19 @@
     <script>
         let searchResults = [];
 
-        // قراءة ملف Excel تلقائيًا من السيرفر
+        // قراءة ملف Excel تلقائيًا مع منع الكاش
         window.onload = () => {
-            fetch('data.xlsx?v=20231103')
+            const timestamp = new Date().getTime(); // توقيع زمني جديد
+            const excelFilePath = `data.xlsx?v=${timestamp}`; // رابط الملف مع توقيع زمني
+
+            fetch(excelFilePath)
                 .then(response => response.arrayBuffer())
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     searchResults = XLSX.utils.sheet_to_json(worksheet); // تحويل البيانات إلى JSON
-                    console.log(searchResults); // يمكنك إزالة هذه السطر لاحقًا
+                    console.log(searchResults); // لمعاينة البيانات في وحدة التحكم (يمكنك إزالة هذا السطر لاحقًا)
                 })
                 .catch(error => console.error('Error loading the Excel file:', error));
         };
@@ -125,7 +128,7 @@
                 card.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
                     <p><strong>التسلسل:</strong> ${result["التسلسل "] || 'غير متوفر'}</p>
-					                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
                     <p><strong>العنوان:</strong> ${result["العنوان"] || 'غير متوفر'}</p>
                     <p><strong>المبلغ بالدولار:</strong> ${formattedDollarAmount} </p>
                     <p><strong>المبلغ بالدينار:</strong> ${formattedDinarAmount} </p>
@@ -138,3 +141,4 @@
     </script>
 </body>
 </html>
+
