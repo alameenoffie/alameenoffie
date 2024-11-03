@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل الديون الشامل - جديد - قديم - كهربائيات</title>
+    <style>
+        /* تنسيقات الصفحة */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+
+        /* تنسيقات البحث */
+        #searchBox {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* تنسيقات النتائج */
+        #results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 800px;
+            justify-content: center;
+        }
+        .result-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 250px;
+            text-align: left;
+            transition: transform 0.3s;
+        }
+        .result-card:hover {
+            transform: scale(1.05);
+        }
+        .result-card h3 {
+            margin: 0;
+            color: #333;
+        }
+        .result-card p {
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <h1>البحث في سجل الديون</h1>
+    <input type="text" id="searchBox" placeholder="اكتب للبحث...">
+    <button onclick="search()">بحث</button>
+    <div id="results"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        let searchResults = [];
+
+        // قراءة ملف Excel تلقائيًا من السيرفر
+        window.onload = () => {
+            fetch('data.xlsx')
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet); // تحويل البيانات إلى JSON
+                    console.log(searchResults); // يمكنك إزالة هذه السطر لاحقًا
+                })
+                .catch(error => console.error('Error loading the Excel file:', error));
+        };
+
+        function search() {
+            const query = document.getElementById("searchBox").value.toLowerCase();
+            const results = searchResults.filter(result => 
+                (result["الاسم"] && result["الاسم"].toLowerCase().includes(query)) || 
+                (result["العنوان"] && result["العنوان"].toLowerCase().includes(query))
+            );
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = ""; // تفريغ المحتوى الحالي
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>لا توجد نتائج.</p>";
+                return;
+            }
+
+            results.forEach(result => {
+                const card = document.createElement("div");
+                card.classList.add("result-card");
+
+                // تنسيق الأرقام الكبيرة باستخدام toLocaleString
+                const formattedDollarAmount = result["المبلغ بالدولار"] ? result["المبلغ بالدولار"].toLocaleString() : 'غير متوفر';
+                const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
+                const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocaleString() : 'غير متوفر';
+
+                card.innerHTML = `
+                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
+                    <p><strong>التسلسل:</strong> ${result["التسلسل "] || 'غير متوفر'}</p>
+					                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><strong>العنوان:</strong> ${result["العنوان"] || 'غير متوفر'}</p>
+                    <p><strong>المبلغ بالدولار:</strong> ${formattedDollarAmount} </p>
+                    <p><strong>المبلغ بالدينار:</strong> ${formattedDinarAmount} </p>
+                    <p><strong>المبلغ المتبقي:</strong> ${formattedRemainingAmount} </p>
+                `;
+
+                resultsContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
