@@ -136,17 +136,24 @@
 
             // قراءة ملف الدين الثابت
             fetch(debtFilePath)
-                .then(response => response.arrayBuffer())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.arrayBuffer();
+                })
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const debtData = XLSX.utils.sheet_to_json(worksheet); // تحويل البيانات إلى JSON
 
+                    console.log(debtData); // لمعاينة البيانات المحملة
+
                     // استخدم البيانات الأولى كمثال، يمكنك تعديله حسب احتياجك
                     if (debtData.length > 0) {
-                        debtAmountDinar = debtData[0]["المبلغ بالدينار"] || 0; // استخدم المبلغ من العمود المحدد
-                        debtAmountDollar = debtData[0]["المبلغ بالدولار"] || 0; // استخدم المبلغ من العمود المحدد
+                        debtAmountDinar = debtData[0]["الدينار"] || 0; // استخدم المبلغ من العمود المحدد
+                        debtAmountDollar = debtData[0]["الدولار"] || 0; // استخدم المبلغ من العمود المحدد
                     }
                 })
                 .catch(error => console.error('Error loading the debt file:', error));
@@ -176,48 +183,4 @@
                 card.classList.add("result-card");
 
                 // تنسيق الأرقام الكبيرة باستخدام toLocaleString
-                const formattedDollarAmount = result["المبلغ بالدولار"] ? result["المبلغ بالدولار"].toLocaleString() : 'غير متوفر';
-                const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
-                const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocaleString() : 'غير متوفر';
-
-                card.innerHTML = `
-                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
-                    <p><strong>التسلسل:</strong> ${result["التسلسل "] || 'غير متوفر'}</p>
-                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
-                    <p><strong>العنوان:</strong> ${result["العنوان"] || 'غير متوفر'}</p>
-                    <p><strong>المبلغ بالدولار:</strong> ${formattedDollarAmount} </p>
-                    <p><strong>المبلغ بالدينار:</strong> ${formattedDinarAmount} </p>
-                    <p><strong>المبلغ المتبقي:</strong> ${formattedRemainingAmount} </p>
-                `;
-
-                resultsContainer.appendChild(card);
-            });
-        }
-
-        function displayDebt() {
-            const debtDisplay = document.getElementById("debtDisplay");
-            
-            // مسح أي محتوى قديم في الحاوية
-            debtDisplay.innerHTML = '';
-
-            // بطاقة الدينار
-            const dinarCard = document.createElement("div");
-            dinarCard.className = "debt-card";
-            dinarCard.innerHTML = `
-                <div class="debt-amount">${debtAmountDinar.toLocaleString()}</div>
-                <div class="currency-label">دينار</div>
-            `;
-            debtDisplay.appendChild(dinarCard);
-
-            // بطاقة الدولار
-            const dollarCard = document.createElement("div");
-            dollarCard.className = "debt-card";
-            dollarCard.innerHTML = `
-                <div class="debt-amount">${debtAmountDollar.toLocaleString()}</div>
-                <div class="currency-label">دولار</div>
-            `;
-            debtDisplay.appendChild(dollarCard);
-        }
-    </script>
-</body>
-</html>
+                const formattedDollarAmount = result["المبلغ بالدولار"] ? result["
