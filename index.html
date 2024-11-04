@@ -77,12 +77,12 @@
             padding: 20px;
             width: 200px;
             text-align: center;
-            margin: 10px;
+            margin: 10px 0; /* تعديل المسافة لظهور البطاقات فوق بعضها */
         }
         .debt-container {
             display: flex;
-            gap: 20px;
-            justify-content: center;
+            flex-direction: column; /* تغيير الاتجاه إلى عمودي */
+            align-items: center; /* محاذاة العناصر في المنتصف */
             margin-top: 20px;
         }
         .debt-amount {
@@ -104,20 +104,17 @@
     <div id="results"></div>
 
     <h1>سجل الدين الثابت</h1>
-    <!-- زر عرض المبلغ الثابت -->
     <button onclick="displayDebt()">عرض مبلغ الدين</button>
     
-    <!-- مكان عرض البطاقات -->
     <div id="debtDisplay" class="debt-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
         let searchResults = [];
 
-        // قراءة ملف Excel تلقائيًا مع منع الكاش
         window.onload = () => {
-            const timestamp = new Date().getTime(); // توقيع زمني جديد
-            const excelFilePath = `data.xlsx?v=${timestamp}`; // رابط الملف مع توقيع زمني
+            const timestamp = new Date().getTime();
+            const excelFilePath = `data.xlsx?v=${timestamp}`;
 
             fetch(excelFilePath)
                 .then(response => response.arrayBuffer())
@@ -125,8 +122,8 @@
                     const workbook = XLSX.read(data, { type: "array" });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    searchResults = XLSX.utils.sheet_to_json(worksheet); // تحويل البيانات إلى JSON
-                    console.log(searchResults); // لمعاينة البيانات في وحدة التحكم (يمكنك إزالة هذا السطر لاحقًا)
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                    console.log(searchResults);
                 })
                 .catch(error => console.error('Error loading the Excel file:', error));
         };
@@ -143,7 +140,7 @@
 
         function displayResults(results) {
             const resultsContainer = document.getElementById("results");
-            resultsContainer.innerHTML = ""; // تفريغ المحتوى الحالي
+            resultsContainer.innerHTML = "";
 
             if (results.length === 0) {
                 resultsContainer.innerHTML = "<p>لا توجد نتائج.</p>";
@@ -154,7 +151,6 @@
                 const card = document.createElement("div");
                 card.classList.add("result-card");
 
-                // تنسيق الأرقام الكبيرة باستخدام toLocaleString
                 const formattedDollarAmount = result["المبلغ بالدولار"] ? result["المبلغ بالدولار"].toLocaleString() : 'غير متوفر';
                 const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
                 const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocaleString() : 'غير متوفر';
@@ -173,17 +169,13 @@
             });
         }
 
-        // مبلغ الدين الثابت بالدينار والدولار
-        const debtAmountDinar = 27636000; // هنا ضع المبلغ بالدينار
-        const debtAmountDollar = 48810.5; // هنا ضع المبلغ بالدولار
+        const debtAmountDinar = 27636000;
+        const debtAmountDollar = 48810.5;
 
         function displayDebt() {
             const debtDisplay = document.getElementById("debtDisplay");
-            
-            // مسح أي محتوى قديم في الحاوية
             debtDisplay.innerHTML = '';
 
-            // بطاقة الدينار
             const dinarCard = document.createElement("div");
             dinarCard.className = "debt-card";
             dinarCard.innerHTML = `
@@ -192,7 +184,6 @@
             `;
             debtDisplay.appendChild(dinarCard);
 
-            // بطاقة الدولار
             const dollarCard = document.createElement("div");
             dollarCard.className = "debt-card";
             dollarCard.innerHTML = `
