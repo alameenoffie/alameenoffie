@@ -77,12 +77,12 @@
             padding: 20px;
             width: 200px;
             text-align: center;
-            margin: 10px 0; /* تعديل المسافة لظهور البطاقات فوق بعضها */
+            margin: 10px 0;
         }
         .debt-container {
             display: flex;
-            flex-direction: column; /* تغيير الاتجاه إلى عمودي */
-            align-items: center; /* محاذاة العناصر في المنتصف */
+            flex-direction: column;
+            align-items: center;
             margin-top: 20px;
         }
         .debt-amount {
@@ -111,10 +111,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
         let searchResults = [];
+        let debtData = { dinar: 0, dollar: 0 }; // لاحتواء بيانات الدين
 
+        // قراءة ملف Excel تلقائيًا مع منع الكاش
         window.onload = () => {
             const timestamp = new Date().getTime();
-            const excelFilePath = `data.xlsx?v=${timestamp}`;
+            const excelFilePath = `dato.xlsx?v=${timestamp}`; // قراءة ملف الدين
 
             fetch(excelFilePath)
                 .then(response => response.arrayBuffer())
@@ -124,6 +126,12 @@
                     const worksheet = workbook.Sheets[firstSheetName];
                     searchResults = XLSX.utils.sheet_to_json(worksheet);
                     console.log(searchResults);
+
+                    // قراءة مبالغ الدين من ملف dato.xlsx
+                    if (searchResults.length > 0) {
+                        debtData.dinar = searchResults[0]["دينار"] || 0; // أخذ أول صف للدينار
+                        debtData.dollar = searchResults[0]["دولار"] || 0; // أخذ أول صف للدولار
+                    }
                 })
                 .catch(error => console.error('Error loading the Excel file:', error));
         };
@@ -169,25 +177,24 @@
             });
         }
 
-        const debtAmountDinar = 27636000; // هنا ضع المبلغ بالدينار
-        const debtAmountDollar = 48810; // هنا ضع المبلغ بالدولار
-
         function displayDebt() {
             const debtDisplay = document.getElementById("debtDisplay");
             debtDisplay.innerHTML = '';
 
+            // بطاقة الدينار
             const dinarCard = document.createElement("div");
             dinarCard.className = "debt-card";
             dinarCard.innerHTML = `
-                <div class="debt-amount">${debtAmountDinar.toLocaleString()}</div>
+                <div class="debt-amount">${debtData.dinar.toLocaleString()}</div>
                 <div class="currency-label">دينار</div>
             `;
             debtDisplay.appendChild(dinarCard);
 
+            // بطاقة الدولار
             const dollarCard = document.createElement("div");
             dollarCard.className = "debt-card";
             dollarCard.innerHTML = `
-                <div class="debt-amount">${debtAmountDollar.toLocaleString()}</div>
+                <div class="debt-amount">${debtData.dollar.toLocaleString()}</div>
                 <div class="currency-label">دولار</div>
             `;
             debtDisplay.appendChild(dollarCard);
