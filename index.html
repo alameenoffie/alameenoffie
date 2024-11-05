@@ -18,11 +18,12 @@
 
         /* تنسيق اللوجو */
         .logo {
-            width: 120px; /* حجم افتراضي للوجو */
+            width: 120px;
             max-width: 100%;
             height: auto;
-            margin-top: 20px; /* مسافة بسيطة من الأعلى */
+            margin-top: 20px;
         }
+
         /* تنسيق العنوان الرئيسي */
         .main-title {
             display: flex;
@@ -45,6 +46,14 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
+        }
+
+        /* تنسيق العناوين الفرعية */
+        .sub-title {
+            color: #333;
+            font-size: 24px;
+            margin: 20px 0 10px;
+            text-align: center;
         }
 
         /* تنسيقات البحث */
@@ -144,8 +153,9 @@
         <button onclick="search()">بحث</button>
         <div id="results"></div>
 
-        <h1>سجل الدين الثابت</h1>
-        <button onclick="displayDebt()">عرض مبلغ الدين</button>
+        <!-- العنوان الفرعي الجديد لمجموع الديون -->
+        <h1 class="sub-title">مجموع الديون</h1>
+        <button onclick="displayDebt()">عرض مجموع الديون</button>
         
         <div id="debtDisplay" class="debt-container"></div>
     </div>
@@ -235,7 +245,7 @@
             });
         }
 
-        // عرض مبلغ الدين الثابت من ملف dato.xlsx
+        // عرض مجموع الديون من ملف dato.xlsx
         function displayDebt() {
             const debtDisplay = document.getElementById("debtDisplay");
             debtDisplay.innerHTML = '';
