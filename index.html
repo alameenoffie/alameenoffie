@@ -14,46 +14,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
 
-        /* تنسيق اللوجو */
-        .logo {
-            width: 120px;
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-
-        /* تنسيق العنوان الرئيسي */
+        /* تنسيقات العنوان */
         .main-title {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
         .main-title h1 {
             color: #333;
-            font-size: 24px;
+            font-size: 28px;
             margin: 10px 0;
         }
 
-        /* تنسيقات المحتوى */
-        .container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        /* تنسيق العناوين الفرعية */
-        .sub-title {
-            color: #333;
-            font-size: 24px;
-            margin: 20px 0 10px;
-            text-align: center;
+        /* تنسيق اللوغو */
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 10px;
         }
 
         /* تنسيقات البحث */
@@ -63,16 +46,19 @@
             width: 100%;
             max-width: 300px;
             margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
         }
         button {
-            padding: 10px 15px;
+            padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
             background-color: #007bff;
             color: #fff;
             border: none;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin: 5px;
         }
         button:hover {
             background-color: #0056b3;
@@ -81,20 +67,22 @@
         /* تنسيقات النتائج */
         #results {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
             gap: 15px;
-            justify-content: center;
+            margin-top: 20px;
             width: 100%;
             max-width: 600px;
+            text-align: center;
         }
         .result-card {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            width: 100%;
-            max-width: 250px;
-            text-align: left;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
             transition: transform 0.3s;
         }
         .result-card:hover {
@@ -103,36 +91,37 @@
         .result-card h3 {
             margin: 0;
             color: #333;
+            font-size: 22px;
         }
         .result-card p {
             color: #555;
             margin-top: 8px;
             line-height: 1.5;
+            font-size: 16px;
         }
 
-        /* تنسيقات البطاقات */
+        /* تنسيقات مجموع الديون */
+        .debt-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
         .debt-card {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            width: 100%;
-            max-width: 200px;
+            width: 150px;
             text-align: center;
-            margin: 10px 0;
         }
-        .debt-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .debt-amount {
+        .debt-card .debt-amount {
             font-size: 24px;
             color: #333;
             font-weight: bold;
         }
-        .currency-label {
+        .debt-card .currency-label {
             font-size: 16px;
             color: #777;
             margin-top: 5px;
@@ -141,66 +130,50 @@
 </head>
 <body>
 
-    <!-- قسم العنوان مع اللوجو -->
     <div class="main-title">
         <img src="logo.png" alt="Logo" class="logo">
         <h1>البحث في سجل الديون</h1>
     </div>
 
-    <!-- محتوى الصفحة -->
-    <div class="container">
-        <input type="text" id="searchBox" placeholder="اكتب للبحث...">
-        <button onclick="search()">بحث</button>
-        <div id="results"></div>
+    <input type="text" id="searchBox" placeholder="اكتب للبحث...">
+    <button onclick="search()">بحث</button>
+    <div id="results"></div>
 
-        <!-- العنوان الفرعي الجديد لمجموع الديون -->
-        <h1 class="sub-title">مجموع الديون</h1>
-        <button onclick="displayDebt()">عرض مجموع الديون</button>
-        
-        <div id="debtDisplay" class="debt-container"></div>
-    </div>
+    <h1 class="sub-title">مجموع الديون</h1>
+    <button onclick="displayDebt()">عرض مجموع الديون</button>
+    <div id="debtDisplay" class="debt-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
         let searchResults = [];
         let debtData = { dinar: 0, dollar: 0 };
 
-        // تحميل ملف الدين الثابت dato.xlsx
+        // تحميل ملف مجموع الديون
         function loadFixedDebt() {
-            const timestamp = new Date().getTime();
-            const debtFilePath = `dato.xlsx?v=${timestamp}`;
-
-            fetch(debtFilePath)
+            fetch('dato.xlsx')
                 .then(response => response.arrayBuffer())
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
-                    const firstSheet = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheet];
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
-
-                    // التأكد من وجود البيانات وأخذ أول صف
                     if (debtJson.length > 0) {
                         debtData.dinar = debtJson[0]["دينار"] || 0;
                         debtData.dollar = debtJson[0]["دولار"] || 0;
                     }
                 })
-                .catch(error => console.error('Error loading the debt Excel file:', error));
+                .catch(error => console.error('Error loading the debt file:', error));
         }
 
-        // تحميل بيانات البحث من data.xlsx
+        // تحميل بيانات البحث من ملف data.xlsx
         function loadSearchData() {
-            const timestamp = new Date().getTime();
-            const searchFilePath = `data.xlsx?v=${timestamp}`;
-
-            fetch(searchFilePath)
+            fetch('data.xlsx')
                 .then(response => response.arrayBuffer())
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
-                    const firstSheet = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheet];
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     searchResults = XLSX.utils.sheet_to_json(worksheet);
                 })
-                .catch(error => console.error('Error loading the search Excel file:', error));
+                .catch(error => console.error('Error loading the search data file:', error));
         }
 
         // عرض نتائج البحث
@@ -210,14 +183,12 @@
                 (result["الاسم"] && result["الاسم"].toLowerCase().includes(query)) || 
                 (result["العنوان"] && result["العنوان"].toLowerCase().includes(query))
             );
-
             displayResults(results);
         }
 
         function displayResults(results) {
             const resultsContainer = document.getElementById("results");
             resultsContainer.innerHTML = "";
-
             if (results.length === 0) {
                 resultsContainer.innerHTML = "<p>لا توجد نتائج.</p>";
                 return;
@@ -226,31 +197,24 @@
             results.forEach(result => {
                 const card = document.createElement("div");
                 card.classList.add("result-card");
-
-                const formattedDollarAmount = result["المبلغ بالدولار"] ? result["المبلغ بالدولار"].toLocaleString() : 'غير متوفر';
-                const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocaleString() : 'غير متوفر';
-                const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
-
                 card.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
-                    <p><strong>التسلسل:</strong> ${result["التسلسل "] || 'غير متوفر'}</p>
                     <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><strong>التسلسل:</strong> ${result["التسلسل"] || 'غير متوفر'}</p>					
                     <p><strong>العنوان:</strong> ${result["العنوان"] || 'غير متوفر'}</p>
-                    <p><strong>المبلغ بالدولار:</strong> ${formattedDollarAmount} </p>
-                    <p><strong>المبلغ بالدينار:</strong> ${formattedDinarAmount} </p>
-                    <p><strong>المبلغ المتبقي:</strong> ${formattedRemainingAmount} </p>
+                    <p><strong>المبلغ بالدينار:</strong> ${result["المبلغ بالدينار"] || 'غير متوفر'}</p>
+                    <p><strong>المبلغ بالدولار:</strong> ${result["المبلغ بالدولار"] || 'غير متوفر'}</p>
+                    <p><strong>المبلغ المتبقي:</strong> ${result["المبلغ المتبقي"] || 'غير متوفر'}</p>					
                 `;
-
                 resultsContainer.appendChild(card);
             });
         }
 
-        // عرض مجموع الديون من ملف dato.xlsx
+        // عرض مجموع الديون
         function displayDebt() {
             const debtDisplay = document.getElementById("debtDisplay");
             debtDisplay.innerHTML = '';
 
-            // بطاقة الدينار
             const dinarCard = document.createElement("div");
             dinarCard.className = "debt-card";
             dinarCard.innerHTML = `
@@ -259,7 +223,6 @@
             `;
             debtDisplay.appendChild(dinarCard);
 
-            // بطاقة الدولار
             const dollarCard = document.createElement("div");
             dollarCard.className = "debt-card";
             dollarCard.innerHTML = `
@@ -269,10 +232,10 @@
             debtDisplay.appendChild(dollarCard);
         }
 
-        // استدعاء تحميل البيانات عند تحميل الصفحة
+        // تحميل البيانات عند تحميل الصفحة
         window.onload = () => {
-            loadFixedDebt(); // تحميل البيانات الثابتة
-            loadSearchData(); // تحميل بيانات البحث
+            loadFixedDebt();
+            loadSearchData();
         };
     </script>
 </body>
