@@ -163,7 +163,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
         let searchResults = [];
-        let debtData = { dinar: 0, dollar: 0 };
+        let debtData = { dinar: 27636000, dollar: 65373.35 };
 
         // تحميل ملف الدين الثابت dato.xlsx
         function loadFixedDebt() {
@@ -180,7 +180,7 @@
 
                     // التأكد من وجود البيانات وأخذ أول صف
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[0]["دينار"] || 0;
+                        debtData.dinar = debtJson[27636000]["دينار"] || 0;
                         debtData.dollar = debtJson[0]["دولار"] || 0;
                     }
                 })
