@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ترحيل الديون إلى قاعدة بيانات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+            margin: 20px;
+        }
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0;
+        }
+        input {
+            padding: 8px;
+            font-size: 16px;
+            margin-top: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button onclick="showReceivedDebtForm()">ديون مستلمة</button>
+
+    <div id="receivedDebtForm" class="form-container">
+        <div class="input-field">
+            <label for="name">الاسم</label>
+            <input type="text" id="name" placeholder="أدخل الاسم">
+        </div>
+        <div class="input-field">
+            <label for="amount">المبلغ</label>
+            <input type="number" id="amount" placeholder="أدخل المبلغ">
+        </div>
+        <div class="input-field">
+            <label for="date">التاريخ</label>
+            <input type="date" id="date">
+        </div>
+        <button onclick="submitDebt()">رفع البيانات</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+<script>
+    // إظهار نموذج الديون المستلمة
+    function showReceivedDebtForm() {
+        document.getElementById("receivedDebtForm").style.display = "flex";
+    }
+
+    // رفع البيانات إلى ملف Excel
+    function submitDebt() {
+        const name = document.getElementById("name").value;
+        const amount = document.getElementById("amount").value;
+        const date = document.getElementById("date").value;
+
+        if (!name || !amount || !date) {
+            alert("يرجى ملء جميع الحقول.");
+            return;
+        }
+
+        // تحميل ملف الديون وفتحه
+        fetch('received_debts.xlsx')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const workbook = XLSX.read(data, { type: "array" });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                // تحويل الورقة إلى صيغة JSON وإضافة البيانات الجديدة
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                sheetData.push([name, amount, date]); // إضافة البيانات الجديدة
+
+                // تحويل البيانات مرة أخرى إلى ورقة Excel
+                const newWorksheet = XLSX.utils.aoa_to_sheet(sheetData);
+                workbook.Sheets[workbook.SheetNames[0]] = newWorksheet;
+
+                // إنشاء ملف Excel جديد بعد إضافة البيانات
+                const newWorkbookData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([newWorkbookData], { type: "application/octet-stream" });
+                
+                // حفظ الملف باستخدام رابط تنزيل
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "received_debts_updated.xlsx"; // اسم الملف الجديد
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // تنظيف الحقول
+                document.getElementById("name").value = "";
+                document.getElementById("amount").value = "";
+                document.getElementById("date").value = "";
+
+                alert("تم رفع البيانات بنجاح!");
+            })
+            .catch(error => console.error('Error loading the debt file:', error));
+    }
+</script>
+</body>
+</html>
