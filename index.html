@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -160,21 +160,50 @@
         <div id="debtDisplay" class="debt-container"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
-        // قراءة ملف Excel تلقائيًا من السيرفر
-        window.onload = () => {
-            fetch('data.xlsx')
+        let searchResults = [];
+        let debtData = { dinar: 0, dollar: 0 };
+
+        // تحميل ملف الدين الثابت dato.xlsx
+        function loadFixedDebt() {
+            const timestamp = new Date().getTime();
+            const debtFilePath = `dato.xlsx?v=${timestamp}`;
+
+            fetch(debtFilePath)
                 .then(response => response.arrayBuffer())
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    searchResults = XLSX.utils.sheet_to_json(worksheet); // تحويل البيانات إلى JSON
-                    console.log(searchResults); // يمكنك إزالة هذه السطر لاحقًا
-                })
-                .catch(error => console.error('Error loading the Excel file:', error));
-        };
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
+                    // التأكد من وجود البيانات وأخذ أول صف
+                    if (debtJson.length > 0) {
+                        debtData.dinar = debtJson[0]["دينار"] || 0;
+                        debtData.dollar = debtJson[0]["دولار"] || 0;
+                    }
+                })
+                .catch(error => console.error('Error loading the debt Excel file:', error));
+        }
+
+        // تحميل بيانات البحث من data.xlsx
+        function loadSearchData() {
+            const timestamp = new Date().getTime();
+            const searchFilePath = `data.xlsx?v=${timestamp}`;
+
+            fetch(searchFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                })
+                .catch(error => console.error('Error loading the search Excel file:', error));
+        }
+
+        // عرض نتائج البحث
         function search() {
             const query = document.getElementById("searchBox").value.toLowerCase();
             const results = searchResults.filter(result => 
@@ -187,7 +216,7 @@
 
         function displayResults(results) {
             const resultsContainer = document.getElementById("results");
-            resultsContainer.innerHTML = ""; // تفريغ المحتوى الحالي
+            resultsContainer.innerHTML = "";
 
             if (results.length === 0) {
                 resultsContainer.innerHTML = "<p>لا توجد نتائج.</p>";
@@ -198,15 +227,14 @@
                 const card = document.createElement("div");
                 card.classList.add("result-card");
 
-                // تنسيق الأرقام الكبيرة باستخدام toLocaleString
                 const formattedDollarAmount = result["المبلغ بالدولار"] ? result["المبلغ بالدولار"].toLocaleString() : 'غير متوفر';
-                const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
                 const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocaleString() : 'غير متوفر';
+                const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
 
                 card.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
                     <p><strong>التسلسل:</strong> ${result["التسلسل "] || 'غير متوفر'}</p>
-					                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
                     <p><strong>العنوان:</strong> ${result["العنوان"] || 'غير متوفر'}</p>
                     <p><strong>المبلغ بالدولار:</strong> ${formattedDollarAmount} </p>
                     <p><strong>المبلغ بالدينار:</strong> ${formattedDinarAmount} </p>
@@ -217,7 +245,7 @@
             });
         }
 
-        // عرض مجموع الديون
+        // عرض مجموع الديون من ملف dato.xlsx
         function displayDebt() {
             const debtDisplay = document.getElementById("debtDisplay");
             debtDisplay.innerHTML = '';
@@ -226,7 +254,7 @@
             const dinarCard = document.createElement("div");
             dinarCard.className = "debt-card";
             dinarCard.innerHTML = `
-                <div class="debt-amount">${totalDebtDinar.toLocaleString()}</div>
+                <div class="debt-amount">${debtData.dinar.toLocaleString()}</div>
                 <div class="currency-label">دينار</div>
             `;
             debtDisplay.appendChild(dinarCard);
@@ -235,15 +263,16 @@
             const dollarCard = document.createElement("div");
             dollarCard.className = "debt-card";
             dollarCard.innerHTML = `
-                <div class="debt-amount">${totalDebtDollar.toLocaleString()}</div>
+                <div class="debt-amount">${debtData.dollar.toLocaleString()}</div>
                 <div class="currency-label">دولار</div>
             `;
             debtDisplay.appendChild(dollarCard);
         }
 
-        // تحميل بيانات البحث عند فتح الصفحة
-        window.onload = function() {
-            // لا شيء هنا، سيتم عرض الدين عند الضغط على الزر
+        // استدعاء تحميل البيانات عند تحميل الصفحة
+        window.onload = () => {
+            loadFixedDebt(); // تحميل البيانات الثابتة
+            loadSearchData(); // تحميل بيانات البحث
         };
     </script>
 </body>
