@@ -155,7 +155,7 @@
         }
         .reload-icon {
             cursor: pointer;
-            font-size: 30px; /* تكبير الأيقونة */
+            font-size: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,9 +164,9 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background-color: transparent; /* خلفية شفافة */
-            border: none; /* إزالة الحدود */
-            color: black; /* جعل الأيقونة باللون الأسود */
+            background-color: transparent;
+            border: none;
+            color: black;
         }
         .dropdown-menu {
             display: none;
@@ -183,7 +183,7 @@
         .dropdown-menu a {
             display: block;
             padding: 10px 15px;
-            color: #000000; /* تغيير اللون إلى الأسود */
+            color: #000000;
             font-weight: bold;
             font-size: 16px;
             background-color: transparent;
@@ -196,6 +196,24 @@
             color: #fff;
         }
 
+        /* Media Queries for responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .result-card, .debt-card {
+                max-width: 90%;
+            }
+
+            #searchBox {
+                max-width: 80%;
+            }
+
+            .logo {
+                width: 100px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -207,7 +225,6 @@
     <div class="menu-container">
         <div class="menu-icon" onclick="toggleDropdown()">⋮</div>
         <div class="dropdown-menu" id="dropdownMenu">
-            <!-- تعديل الرابط لفتح الصفحات الجديدة عند الضغط -->
             <a href="mony2024.html">الديون المستلمة 2024</a>
             <a href="mony2023.html">الديون المستلمة 2023</a>
             <a href="mony2022.html">الديون المستلمة 2022</a>
@@ -226,7 +243,6 @@
         <button onclick="search()">بحث</button>
         <div id="results"></div>
 
-        <!-- العنوان الفرعي الجديد لمجموع الديون -->
         <h1 class="sub-title">مجموع الديون</h1>
         <button onclick="displayDebt()">عرض مجموع الديون</button>
         
@@ -238,7 +254,6 @@
         let searchResults = [];
         let debtData = { dinar: 27636000, dollar: 65373 };
 
-        // تحميل ملف الدين الثابت dato.xlsx
         function loadFixedDebt() {
             const timestamp = new Date().getTime();
             const debtFilePath = `dato.xlsx?v=${timestamp}`;
@@ -251,16 +266,14 @@
                     const worksheet = workbook.Sheets[firstSheet];
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
-                    // التأكد من وجود البيانات وأخذ أول صف
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[27636000]["دينار"] || 0;
+                        debtData.dinar = debtJson[0]["دينار"] || 0;
                         debtData.dollar = debtJson[0]["دولار"] || 0;
                     }
                 })
                 .catch(error => console.error('Error loading the debt Excel file:', error));
         }
 
-        // تحميل بيانات البحث من data.xlsx
         function loadSearchData() {
             const timestamp = new Date().getTime();
             const searchFilePath = `data.xlsx?v=${timestamp}`;
@@ -276,7 +289,6 @@
                 .catch(error => console.error('Error loading the search Excel file:', error));
         }
 
-        // وظيفة البحث
         function search() {
             const searchTerm = document.getElementById("searchBox").value.toLowerCase();
             const resultsContainer = document.getElementById("results");
@@ -301,7 +313,6 @@
             }
         }
 
-        // عرض مجموع الديون
         function displayDebt() {
             const debtDisplay = document.getElementById("debtDisplay");
             debtDisplay.innerHTML = `
@@ -316,18 +327,15 @@
             `;
         }
 
-        // التبديل بين إظهار وإخفاء القائمة المنسدلة
         function toggleDropdown() {
             const dropdown = document.getElementById("dropdownMenu");
             dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
         }
 
-        // إعادة تحميل الصفحة
         function reloadPage() {
             location.reload();
         }
 
-        // تحميل البيانات عند تحميل الصفحة
         window.onload = function() {
             loadFixedDebt();
             loadSearchData();
