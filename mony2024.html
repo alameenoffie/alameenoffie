@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البحث في قاعدة بيانات الديون</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* تنسيقات الصفحة */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* تنسيق العنوان الرئيسي */
+        .main-title {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .main-title h1 {
+            color: #333;
+            font-size: 26px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        /* إضافة أيقونة العودة إلى الصفحة الرئيسية */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;  /* تم تصغير الحجم إلى 24px */
+            cursor: pointer;
+            color: #000;  /* لون الأيقونة أسود */
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            color: #007bff;  /* تغيير اللون عند التمرير عليها */
+        }
+
+        /* تنسيقات البحث */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+            margin: 20px;
+        }
+
+        #searchBox {
+            padding: 12px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* تنسيقات النتائج */
+        #results {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: left;
+            transition: transform 0.3s;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .result-card:hover {
+            transform: scale(1.05);
+        }
+
+        .result-card h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .result-card p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .result-card .amount {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-card .date {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* تنسيق النص "لا توجد نتائج" */
+        .no-results {
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* تنسيقات الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .main-title h1 {
+                font-size: 22px;
+            }
+
+            #searchBox {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            .result-card h3 {
+                font-size: 16px;
+            }
+
+            .result-card p {
+                font-size: 12px;
+            }
+
+            .result-card .amount {
+                font-size: 14px;
+            }
+
+            .result-card .date {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title h1 {
+                font-size: 20px;
+            }
+
+            #searchBox {
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 12px;
+            }
+
+            .result-card h3 {
+                font-size: 14px;
+            }
+
+            .result-card p {
+                font-size: 11px;
+            }
+
+            .result-card .amount {
+                font-size: 12px;
+            }
+
+            .result-card .date {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- أيقونة العودة إلى الصفحة الرئيسية -->
+    <a href="index.html" class="back-button"><i class="fas fa-home"></i></a>
+
+    <!-- عنوان الصفحة -->
+    <div class="main-title">
+        <h1>البحث في الديون المستلمة 2024</h1>
+    </div>
+
+    <!-- محتوى البحث -->
+    <div class="container">
+        <input type="text" id="searchBox" placeholder="اكتب للبحث...">
+        <button onclick="search()">بحث</button>
+        <div id="noResults" class="no-results" style="display: none;">لا توجد نتائج</div>
+        <div id="results"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        let searchResults = [];
+
+        // تحميل بيانات قاعدة بيانات "mony.xlsx"
+        function loadSearchData() {
+            const timestamp = new Date().getTime();
+            const searchFilePath = `mony2024.xlsx?v=${timestamp}`;
+
+            fetch(searchFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                })
+                .catch(error => console.error('Error loading the search Excel file:', error));
+        }
+
+        // وظيفة البحث
+        function search() {
+            const searchTerm = document.getElementById("searchBox").value.toLowerCase();
+            const resultsContainer = document.getElementById("results");
+            const noResultsContainer = document.getElementById("noResults");
+            resultsContainer.innerHTML = "";
+
+            const filteredResults = searchResults.filter(result => 
+                result["الاسم"] && result["الاسم"].toLowerCase().includes(searchTerm) || 
+                result["العنوان"] && result["العنوان"].toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredResults.length > 0) {
+                filteredResults.forEach(result => {
+                    const resultCard = document.createElement("div");
+                    resultCard.className = "result-card";
+                    resultCard.innerHTML = `
+                        <h3>${result["الاسم"]}</h3>
+                        <p>${result["العنوان"]}</p>
+                        <div class="amount">المبلغ بالدينار: ${result["المبلغ بالدينار"]}</div>
+                        <div class="amount">المبلغ بالدولار: ${result["المبلغ بالدولار"]}</div>
+                        <div class="date">تاريخ الاستلام: ${result["تاريخ الاستلام"]}</div>
+                    `;
+                    resultsContainer.appendChild(resultCard);
+                });
+                noResultsContainer.style.display = "none";  // إخفاء نص "لا توجد نتائج"
+            } else {
+                noResultsContainer.style.display = "block";  // عرض نص "لا توجد نتائج"
+            }
+        }
+
+        // تحميل البيانات عند تحميل الصفحة
+        window.onload = function() {
+            loadSearchData();
+        };
+    </script>
+</body>
+</html>
