@@ -137,7 +137,7 @@
             width: 200px;
         }
         .dropdown-menu a {
-            color: #000; /* تغيير لون الخيارات إلى الأسود */
+            color: #000;
             text-decoration: none;
             display: flex;
             justify-content: space-between;
@@ -149,9 +149,11 @@
             color: #333;
             font-size: 14px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         .user-info span {
-            display: block;
             font-size: 12px;
             color: #4CAF50;
         }
@@ -176,7 +178,8 @@
     <!-- القائمة المنسدلة -->
     <div class="dropdown-menu" id="dropdownMenu">
         <div class="user-info">
-            اسم المستخدم
+            <i class="fas fa-user"></i> <!-- أيقونة المستخدم -->
+            
             <span>basheer</span>
         </div>
         <a href="#">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
