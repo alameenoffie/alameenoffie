@@ -137,7 +137,7 @@
             width: 200px;
         }
         .dropdown-menu a {
-            color: #4CAF50;
+            color: #000; /* تغيير لون الخيارات إلى الأسود */
             text-decoration: none;
             display: flex;
             justify-content: space-between;
@@ -228,8 +228,8 @@
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
-                        debtData.dollar = debtJson[0]["دولار"] || 65373;
+                        debtData.dinar = debtJson[0]["دينار"] || 0;
+                        debtData.dollar = debtJson[0]["دولار"] || 0;
                     }
                 })
                 .catch(error => console.error('Error loading the debt Excel file:', error));
@@ -280,6 +280,7 @@
                     <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
                     <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
                     <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
+					                    <p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] || 'غير متوفر'}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
             });
