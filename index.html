@@ -1,163 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سجل الديون الشامل</title>
+    <title>محرك بحث الديون</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* تنسيقات الصفحة */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             align-items: center;
-        }
-
-        /* تنسيق اللوجو */
-        .logo {
-            width: 120px;
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-
-        /* تنسيق العنوان الرئيسي */
-        .main-title {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .main-title h1 {
-            color: #333;
-            font-size: 24px;
-            margin: 10px 0;
-        }
-
-        /* تنسيقات المحتوى */
-        .container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
             padding: 20px;
+            position: relative;
         }
-
-        /* تنسيق العناوين الفرعية */
-        .sub-title {
-            color: #333;
-            font-size: 24px;
-            margin: 20px 0 10px;
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             text-align: center;
         }
-
-        /* تنسيقات البحث */
-        #searchBox {
-            padding: 10px;
-            font-size: 16px;
-            width: 100%;
-            max-width: 300px;
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100px;
+            height: auto;
+        }
+        h2 {
+            color: #333;
             margin-bottom: 20px;
         }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
         button {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #007bff;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
             color: #fff;
             border: none;
             border-radius: 5px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #45a049;
         }
-
-        /* تنسيقات النتائج */
         #results {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            width: 100%;
-            max-width: 600px;
-        }
-        .result-card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            width: 100%;
-            max-width: 250px;
-            text-align: left;
-            transition: transform 0.3s;
-        }
-        .result-card:hover {
-            transform: scale(1.05);
-        }
-        .result-card h3 {
-            margin: 0;
-            color: #333;
-        }
-        .result-card p {
-            color: #555;
-            margin-top: 8px;
-            line-height: 1.5;
-        }
-
-        /* تنسيقات البطاقات */
-        .debt-card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 100%;
-            max-width: 200px;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .debt-container {
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 15px;
+        }
+        .result-item {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .result-item:hover {
+            transform: scale(1.02);
+        }
+        .result-item h3 {
+            color: #4CAF50;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .result-item p {
+            font-size: 14px;
+            color: #555;
+            margin: 4px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #333;
+        }
+        .summary-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
             margin-top: 20px;
         }
-        .debt-amount {
-            font-size: 24px;
-            color: #333;
-            font-weight: bold;
+        .card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .currency-label {
-            font-size: 16px;
-            color: #777;
-            margin-top: 5px;
+        .reload-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #4CAF50;
+        }
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            padding: 10px;
+        }
+        .dropdown-menu a {
+            color: #4CAF50;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+        }
+        .user-info {
+            text-align: right;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .user-info span {
+            display: block;
+            font-size: 12px;
+            color: #4CAF50;
         }
     </style>
 </head>
 <body>
-
-    <!-- قسم العنوان مع اللوجو -->
-    <div class="main-title">
-        <img src="logo.png" alt="Logo" class="logo">
-        <h1>البحث في سجل الديون</h1>
+    <i class="fas fa-redo-alt reload-icon" onclick="location.reload()"></i>
+    <i class="fas fa-ellipsis-v menu-icon" onclick="toggleMenu()"></i>
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="user-info">
+            اسم المستخدم
+            <span>basheer</span>
+        </div>
+        <a href="#">الديون المستلمة 2024</a>
+        <a href="#">الديون المستلمة 2023</a>
+        <a href="#">الديون المستلمة 2022</a>
     </div>
-
-    <!-- محتوى الصفحة -->
     <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h2>البحث في سجل الديون</h2>
         <input type="text" id="searchBox" placeholder="اكتب للبحث...">
         <button onclick="search()">بحث</button>
-        <div id="results"></div>
-
-        <!-- العنوان الفرعي الجديد لمجموع الديون -->
-        <h1 class="sub-title">مجموع الديون</h1>
         <button onclick="displayDebt()">عرض مجموع الديون</button>
-        
-        <div id="debtDisplay" class="debt-container"></div>
+        <div id="results"></div>
+        <div class="summary-cards" id="debtDisplay" style="display:none;">
+            <div class="card">
+                <h3>المجموع بالدينار</h3>
+                <p id="totalDinar">0 دينار</p>
+            </div>
+            <div class="card">
+                <h3>المجموع بالدولار</h3>
+                <p id="totalDollar">0 دولار</p>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -165,7 +190,11 @@
         let searchResults = [];
         let debtData = { dinar: 27636000, dollar: 65373 };
 
-        // تحميل ملف الدين الثابت dato.xlsx
+        function toggleMenu() {
+            const menu = document.getElementById("dropdownMenu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
         function loadFixedDebt() {
             const timestamp = new Date().getTime();
             const debtFilePath = `dato.xlsx?v=${timestamp}`;
@@ -178,16 +207,14 @@
                     const worksheet = workbook.Sheets[firstSheet];
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
-                    // التأكد من وجود البيانات وأخذ أول صف
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[27636000]["دينار"] || 0;
+                        debtData.dinar = debtJson[0]["دينار"] || 0;
                         debtData.dollar = debtJson[0]["دولار"] || 0;
                     }
                 })
                 .catch(error => console.error('Error loading the debt Excel file:', error));
         }
 
-        // تحميل بيانات البحث من data.xlsx
         function loadSearchData() {
             const timestamp = new Date().getTime();
             const searchFilePath = `data.xlsx?v=${timestamp}`;
@@ -203,7 +230,6 @@
                 .catch(error => console.error('Error loading the search Excel file:', error));
         }
 
-        // عرض نتائج البحث
         function search() {
             const query = document.getElementById("searchBox").value.toLowerCase();
             const results = searchResults.filter(result => 
@@ -224,55 +250,40 @@
             }
 
             results.forEach(result => {
-                const card = document.createElement("div");
-                card.classList.add("result-card");
+                const resultItem = document.createElement("div");
+                resultItem.classList.add("result-item");
 
                 const formattedDollarAmount = result["المبلغ بالدولار"] ? result["المبلغ بالدولار"].toLocaleString() : 'غير متوفر';
-                const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocaleString() : 'غير متوفر';
+                const formattedDinarAmount = result["المبلغ بالدينار"] ? result["المبلغ بالدينار"].toLocale                    .localeString() : 'غير متوفر';
                 const formattedRemainingAmount = result["المبلغ المتبقي"] ? result["المبلغ المتبقي"].toLocaleString() : 'غير متوفر';
 
-                card.innerHTML = `
+                resultItem.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
-                    <p><strong>التسلسل:</strong> ${result["التسلسل "] || 'غير متوفر'}</p>
-                    <p><strong>السجل:</strong> ${result["السجل"] || 'غير متوفر'}</p>
-                    <p><strong>العنوان:</strong> ${result["العنوان"] || 'غير متوفر'}</p>
-                    <p><strong>المبلغ بالدولار:</strong> ${formattedDollarAmount} </p>
-                    <p><strong>المبلغ بالدينار:</strong> ${formattedDinarAmount} </p>
-                    <p><strong>المبلغ المتبقي:</strong> ${formattedRemainingAmount} </p>
+                    <p><span class="highlight">التسلسل:</span> ${result["التسلسل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">العنوان:</span> ${result["العنوان"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${formattedDinarAmount} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${formattedDollarAmount} دولار</p>
+                    <p><span class="highlight">المبلغ المتبقي:</span> ${formattedRemainingAmount}</p>
                 `;
-
-                resultsContainer.appendChild(card);
+                resultsContainer.appendChild(resultItem);
             });
         }
 
-        // عرض مجموع الديون من ملف dato.xlsx
         function displayDebt() {
-            const debtDisplay = document.getElementById("debtDisplay");
-            debtDisplay.innerHTML = '';
+            const totalDinarElement = document.getElementById("totalDinar");
+            const totalDollarElement = document.getElementById("totalDollar");
+            const summaryCards = document.getElementById("debtDisplay");
 
-            // بطاقة الدينار
-            const dinarCard = document.createElement("div");
-            dinarCard.className = "debt-card";
-            dinarCard.innerHTML = `
-                <div class="debt-amount">${debtData.dinar.toLocaleString()}</div>
-                <div class="currency-label">دينار</div>
-            `;
-            debtDisplay.appendChild(dinarCard);
+            totalDinarElement.textContent = `${debtData.dinar.toLocaleString()} دينار`;
+            totalDollarElement.textContent = `${debtData.dollar.toLocaleString()} دولار`;
 
-            // بطاقة الدولار
-            const dollarCard = document.createElement("div");
-            dollarCard.className = "debt-card";
-            dollarCard.innerHTML = `
-                <div class="debt-amount">${debtData.dollar.toLocaleString()}</div>
-                <div class="currency-label">دولار</div>
-            `;
-            debtDisplay.appendChild(dollarCard);
+            summaryCards.style.display = 'flex';
         }
 
-        // استدعاء تحميل البيانات عند تحميل الصفحة
         window.onload = () => {
-            loadFixedDebt(); // تحميل البيانات الثابتة
-            loadSearchData(); // تحميل بيانات البحث
+            loadFixedDebt();
+            loadSearchData();
         };
     </script>
 </body>
