@@ -134,11 +134,14 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: right;
             padding: 10px;
+            width: 200px;
         }
         .dropdown-menu a {
             color: #4CAF50;
             text-decoration: none;
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 10px 0;
         }
         .user-info {
@@ -151,6 +154,17 @@
             display: block;
             font-size: 12px;
             color: #4CAF50;
+        }
+        .availability-status {
+            font-size: 10px;
+            background-color: #ddd;
+            color: #555;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .available {
+            background-color: #4CAF50;
+            color: #fff;
         }
     </style>
 </head>
@@ -165,9 +179,9 @@
             اسم المستخدم
             <span>basheer</span>
         </div>
-        <a href="#">الديون المستلمة 2024</a>
-        <a href="#">الديون المستلمة 2023</a>
-        <a href="#">الديون المستلمة 2022</a>
+        <a href="#">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
+        <a href="#">الديون المستلمة 2023 <span class="availability-status">غير متوفر</span></a>
+        <a href="#">الديون المستلمة 2022 <span class="availability-status">غير متوفر</span></a>
     </div>
 
     <!-- محتوى الصفحة الرئيسي -->
@@ -214,8 +228,8 @@
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
-                        debtData.dollar = debtJson[0]["دولار"] || 65373;
+                        debtData.dinar = debtJson[0]["دينار"] || 0;
+                        debtData.dollar = debtJson[0]["دولار"] || 0;
                     }
                 })
                 .catch(error => console.error('Error loading the debt Excel file:', error));
@@ -266,8 +280,6 @@
                     <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
                     <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
                     <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
-					<p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] || 'غير متوفر'}</p>
-					
                 `;
                 resultsContainer.appendChild(resultItem);
             });
