@@ -150,8 +150,8 @@
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[0]["دينار"] || 0;
-                        debtData.dollar = debtJson[0]["دولار"] || 0;
+                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
+                        debtData.dollar = debtJson[0]["دولار"] || 65373;
                     }
                 })
                 .catch(error => console.error('Error loading the debt Excel file:', error));
