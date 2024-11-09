@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرك بحث الديون</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* تصميم مدمج من الكود الأول */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            padding: 20px;
+            position: relative;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100px;
+            height: auto;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .result-item {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .result-item:hover {
+            transform: scale(1.02);
+        }
+        .result-item h3 {
+            color: #4CAF50;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .result-item p {
+            font-size: 14px;
+            color: #555;
+            margin: 4px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #333;
+        }
+        .summary-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- إعادة تصميم الصفحة مع إضافة الوظائف -->
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h2>البحث في سجل الديون</h2>
+        <input type="text" id="searchBox" placeholder="اكتب للبحث...">
+        <button onclick="search()">بحث</button>
+        <button onclick="displayDebt()">عرض مجموع الديون</button>
+
+        <div id="results"></div>
+        <div class="summary-cards" id="debtDisplay" style="display:none;">
+            <div class="card">
+                <h3>المجموع بالدينار</h3>
+                <p id="totalDinar">27636000 دينار</p>
+            </div>
+            <div class="card">
+                <h3>المجموع بالدولار</h3>
+                <p id="totalDollar">65373 دولار</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        let searchResults = [];
+        let debtData = { dinar: 27636000, dollar: 65373 };
+
+        function loadFixedDebt() {
+            const timestamp = new Date().getTime();
+            const debtFilePath = `dato.xlsx?v=${timestamp}`;
+
+            fetch(debtFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    const debtJson = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (debtJson.length > 0) {
+                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
+                        debtData.dollar = debtJson[0]["دولار"] || 65373;
+                    }
+                })
+                .catch(error => console.error('Error loading the debt Excel file:', error));
+        }
+
+        function loadSearchData() {
+            const timestamp = new Date().getTime();
+            const searchFilePath = `data.xlsx?v=${timestamp}`;
+
+            fetch(searchFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                })
+                .catch(error => console.error('Error loading the search Excel file:', error));
+        }
+
+        function search() {
+            const query = document.getElementById("searchBox").value.toLowerCase();
+            const results = searchResults.filter(result => 
+                (result["الاسم"] && result["الاسم"].toLowerCase().includes(query)) || 
+                (result["العنوان"] && result["العنوان"].toLowerCase().includes(query))
+            );
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>لا توجد نتائج</p>";
+                return;
+            }
+
+            results.forEach(result => {
+                const resultItem = document.createElement("div");
+                resultItem.classList.add("result-item");
+
+                resultItem.innerHTML = `
+                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
+                    <p><span class="highlight">التسلسل:</span> ${result["التسلسل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">العنوان:</span> ${result["العنوان"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
+					<p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] || 'غير متوفر'}</p>
+                `;
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+        function displayDebt() {
+            const totalDinarElement = document.getElementById("totalDinar");
+            const totalDollarElement = document.getElementById("totalDollar");
+            const summaryCards = document.getElementById("debtDisplay");
+
+            totalDinarElement.textContent = `${debtData.dinar.toLocaleString()} دينار`;
+            totalDollarElement.textContent = `${debtData.dollar.toLocaleString()} دولار`;
+
+            summaryCards.style.display = 'flex';
+        }
+
+        window.onload = () => {
+            loadFixedDebt();
+            loadSearchData();
+        };
+    </script>
+</body>
+</html>
