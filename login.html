@@ -6,7 +6,6 @@
     <title>محرك بحث الديون</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* تصميم مدمج من الكود الأول */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -108,10 +107,70 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        .reload-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #4CAF50;
+        }
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            padding: 10px;
+        }
+        .dropdown-menu a {
+            color: #4CAF50;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+        }
+        .user-info {
+            text-align: right;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .user-info span {
+            display: block;
+            font-size: 12px;
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
-    <!-- إعادة تصميم الصفحة مع إضافة الوظائف -->
+    <!-- أيقونات أعلى الصفحة -->
+    <i class="fas fa-redo-alt reload-icon" onclick="location.reload()"></i>
+    <i class="fas fa-ellipsis-v menu-icon" onclick="toggleMenu()"></i>
+
+    <!-- القائمة المنسدلة -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="user-info">
+            اسم المستخدم
+            <span>basheer</span>
+        </div>
+        <a href="#">الديون المستلمة 2024</a>
+        <a href="#">الديون المستلمة 2023</a>
+        <a href="#">الديون المستلمة 2022</a>
+    </div>
+
+    <!-- محتوى الصفحة الرئيسي -->
     <div class="container">
         <img src="logo.png" alt="Logo" class="logo">
         <h2>البحث في سجل الديون</h2>
@@ -123,11 +182,11 @@
         <div class="summary-cards" id="debtDisplay" style="display:none;">
             <div class="card">
                 <h3>المجموع بالدينار</h3>
-                <p id="totalDinar">27636000 دينار</p>
+                <p id="totalDinar">0 دينار</p>
             </div>
             <div class="card">
                 <h3>المجموع بالدولار</h3>
-                <p id="totalDollar">65373 دولار</p>
+                <p id="totalDollar">0 دولار</p>
             </div>
         </div>
     </div>
@@ -136,6 +195,11 @@
     <script>
         let searchResults = [];
         let debtData = { dinar: 27636000, dollar: 65373 };
+
+        function toggleMenu() {
+            const menu = document.getElementById("dropdownMenu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
 
         function loadFixedDebt() {
             const timestamp = new Date().getTime();
@@ -203,6 +267,7 @@
                     <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
                     <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
 					<p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] || 'غير متوفر'}</p>
+					
                 `;
                 resultsContainer.appendChild(resultItem);
             });
