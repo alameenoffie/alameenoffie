@@ -168,18 +168,24 @@
             background-color: #4CAF50;
             color: #fff;
         }
+        /* إضافة الكود الخاص لمربع "غير متوفر" */
+        .not-available {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #e0e0e0;
+            color: #555;
+            border-radius: 4px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
-    <!-- أيقونات أعلى الصفحة -->
     <i class="fas fa-redo-alt reload-icon" onclick="location.reload()"></i>
     <i class="fas fa-ellipsis-v menu-icon" onclick="toggleMenu()"></i>
 
-    <!-- القائمة المنسدلة -->
     <div class="dropdown-menu" id="dropdownMenu">
         <div class="user-info">
-            <i class="fas fa-user"></i> <!-- أيقونة المستخدم -->
-            
+            <i class="fas fa-user"></i>
             <span>basheer</span>
         </div>
         <a href="#">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
@@ -187,7 +193,6 @@
         <a href="#">الديون المستلمة 2022 <span class="availability-status available">متوفر</span></a>
     </div>
 
-    <!-- محتوى الصفحة الرئيسي -->
     <div class="container">
         <img src="logo.png" alt="Logo" class="logo">
         <h2>البحث في سجل الديون</h2>
@@ -283,7 +288,7 @@
                     <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
                     <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
                     <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
-					                    <p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] ? result["المبلغ المتبقي"] + ' دينار' : '<span class="not-available">غير متوفر</span>'}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
             });
