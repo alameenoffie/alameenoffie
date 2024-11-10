@@ -295,7 +295,7 @@
                 const amountDollar = result["مبلغ بالدولار"] ? Number(result["مبلغ بالدولار"]).toLocaleString() : 'غير متوفر';
 
                 resultItem.innerHTML = `
-                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
+                    <h3>${result["اسم"] || 'غير متوفر'}</h3>
                     <p><span class="highlight">المبلغ بالدولار:</span> ${amountDinar} دولار</p>
                     <p><span class="highlight">المبلغ بالدينار:</span> ${amountDollar} دينار</p>
                     <p><span class="highlight">التاريخ:</span> ${receivedDate}</p>
