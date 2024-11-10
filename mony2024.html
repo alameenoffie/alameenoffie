@@ -281,11 +281,21 @@
                 const resultItem = document.createElement("div");
                 resultItem.classList.add("result-item");
 
+                // التحقق من وجود تاريخ وتحويله إن وجد
+                let receivedDate = result["تاريخ الاستلام"];
+                if (receivedDate) {
+                    const excelDate = Number(receivedDate);
+                    const dateObject = new Date((excelDate - 25569) * 86400 * 1000);
+                    receivedDate = dateObject.toISOString().split('T')[0]; // تحويل التاريخ إلى تنسيق "YYYY-MM-DD"
+                } else {
+                    receivedDate = 'غير متوفر';
+                }
+
                 resultItem.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
                     <p><span class="highlight">المبلغ بالدينار:</span> ${result["مبلغ بالدينار"] || 'غير متوفر'} دينار</p>
                     <p><span class="highlight">المبلغ بالدولار:</span> ${result["مبلغ بالدولار"] || 'غير متوفر'} دولار</p>
-                    <p><span class="highlight">التاريخ:</span> ${result["تاريخ الاستلام"] || 'غير متوفر'} </p>
+                    <p><span class="highlight">التاريخ:</span> ${receivedDate}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
             });
