@@ -168,15 +168,6 @@
             background-color: #4CAF50;
             color: #fff;
         }
-        /* إضافة الكود الخاص لمربع "غير متوفر" */
-        .not-available {
-            display: inline-block;
-            padding: 4px 8px;
-            background-color: #e0e0e0;
-            color: #555;
-            border-radius: 4px;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -280,12 +271,16 @@
                 const resultItem = document.createElement("div");
                 resultItem.classList.add("result-item");
 
+                // تنسيق المبلغ وإظهار التاريخ كما هو
+                const formattedDinar = result["المبلغ بالدينار"] ? Number(result["المبلغ بالدينار"]).toLocaleString() : 'غير متوفر';
+                const formattedDollar = result["المبلغ بالدولار"] ? Number(result["المبلغ بالدولار"]).toLocaleString() : 'غير متوفر';
+                const displayDate = result["التاريخ"] || 'غير متوفر';
+
                 resultItem.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
-
-                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
-                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
-					                    <p><span class="highlight">التاريخ:</span> ${result["التاريخ"] || 'غير متوفر'} </p>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${formattedDinar} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${formattedDollar} دولار</p>
+                    <p><span class="highlight">التاريخ:</span> ${displayDate}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
             });
