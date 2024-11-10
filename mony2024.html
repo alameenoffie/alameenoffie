@@ -168,7 +168,6 @@
             background-color: #4CAF50;
             color: #fff;
         }
-        /* إضافة الكود الخاص لمربع "غير متوفر" */
         .not-available {
             display: inline-block;
             padding: 4px 8px;
@@ -281,20 +280,24 @@
                 const resultItem = document.createElement("div");
                 resultItem.classList.add("result-item");
 
-                // التحقق من وجود تاريخ وتحويله إن وجد
+                // تحويل التاريخ إلى صيغة مفهومة
                 let receivedDate = result["تاريخ الاستلام"];
                 if (receivedDate) {
                     const excelDate = Number(receivedDate);
                     const dateObject = new Date((excelDate - 25569) * 86400 * 1000);
-                    receivedDate = dateObject.toISOString().split('T')[0]; // تحويل التاريخ إلى تنسيق "YYYY-MM-DD"
+                    receivedDate = dateObject.toISOString().split('T')[0];
                 } else {
                     receivedDate = 'غير متوفر';
                 }
 
+                // تنسيق المبالغ بالفواصل
+                const amountDinar = result["مبلغ بالدينار"] ? Number(result["مبلغ بالدينار"]).toLocaleString() : 'غير متوفر';
+                const amountDollar = result["مبلغ بالدولار"] ? Number(result["مبلغ بالدولار"]).toLocaleString() : 'غير متوفر';
+
                 resultItem.innerHTML = `
                     <h3>${result["الاسم"] || 'غير متوفر'}</h3>
-                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["مبلغ بالدينار"] || 'غير متوفر'} دينار</p>
-                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["مبلغ بالدولار"] || 'غير متوفر'} دولار</p>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${amountDinar} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${amountDollar} دولار</p>
                     <p><span class="highlight">التاريخ:</span> ${receivedDate}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
