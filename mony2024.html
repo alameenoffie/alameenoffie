@@ -168,6 +168,7 @@
             background-color: #4CAF50;
             color: #fff;
         }
+        /* إضافة الكود الخاص لمربع "غير متوفر" */
         .not-available {
             display: inline-block;
             padding: 4px 8px;
@@ -187,7 +188,7 @@
             <i class="fas fa-user"></i>
             <span>basheer</span>
         </div>
-        <a href="#">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
+        <a href="mony2024.html">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
         <a href="#">الديون المستلمة 2023 <span class="availability-status available">متوفر</span></a>
         <a href="#">الديون المستلمة 2022 <span class="availability-status available">متوفر</span></a>
     </div>
@@ -197,7 +198,6 @@
         <h2>البحث في المبالغ المستلمة 2024</h2>
         <input type="text" id="searchBox" placeholder="اكتب للبحث...">
         <button onclick="search()">بحث</button>
-
 
         <div id="results"></div>
         <div class="summary-cards" id="debtDisplay" style="display:none;">
@@ -244,7 +244,7 @@
 
         function loadSearchData() {
             const timestamp = new Date().getTime();
-            const searchFilePath = `data.xlsx?v=${timestamp}`;
+            const searchFilePath = `data2.xlsx?v=${timestamp}`;
 
             fetch(searchFilePath)
                 .then(response => response.arrayBuffer())
@@ -260,8 +260,8 @@
         function search() {
             const query = document.getElementById("searchBox").value.toLowerCase();
             const results = searchResults.filter(result => 
-                (result["اسم"] && result["الاسم"].toLowerCase().includes(query)) || 
-                (result["عنوان"] && result["العنوان"].toLowerCase().includes(query))
+                (result["الاسم"] && result["الاسم"].toLowerCase().includes(query)) || 
+                (result["العنوان"] && result["العنوان"].toLowerCase().includes(query))
             );
 
             displayResults(results);
@@ -280,25 +280,14 @@
                 const resultItem = document.createElement("div");
                 resultItem.classList.add("result-item");
 
-                // تحويل التاريخ إلى صيغة مفهومة
-                let receivedDate = result["تاريخ الاستلام"];
-                if (receivedDate) {
-                    const excelDate = Number(receivedDate);
-                    const dateObject = new Date((excelDate - 25569) * 86400 * 1000);
-                    receivedDate = dateObject.toISOString().split('T')[0];
-                } else {
-                    receivedDate = 'غير متوفر';
-                }
-
-                // تنسيق المبالغ بالفواصل
-                const amountDinar = result["مبلغ بالدينار"] ? Number(result["مبلغ بالدينار"]).toLocaleString() : 'غير متوفر';
-                const amountDollar = result["مبلغ بالدولار"] ? Number(result["مبلغ بالدولار"]).toLocaleString() : 'غير متوفر';
-
                 resultItem.innerHTML = `
-                    <h3>${result["اسم"] || 'غير متوفر'}</h3>
-                    <p><span class="highlight">المبلغ بالدولار:</span> ${amountDinar} دولار</p>
-                    <p><span class="highlight">المبلغ بالدينار:</span> ${amountDollar} دينار</p>
-                    <p><span class="highlight">التاريخ:</span> ${receivedDate}</p>
+                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
+                    <p><span class="highlight">التسلسل:</span> ${result["التسلسل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">العنوان:</span> ${result["العنوان"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
+                    <p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] ? result["المبلغ المتبقي"] : '<span class="not-available">غير متوفر</span>'}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
             });
