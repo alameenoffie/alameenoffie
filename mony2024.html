@@ -291,7 +291,6 @@
                 }
 
                 // تنسيق المبالغ بالفواصل
-                const amountDinar = result["المبلغ بالدينار"] ? Number(result["المبلغ بالدولار"]).toLocaleString() : 'غير متوفر';
                 const amountDollar = result["المبلغ بالدولار"] ? Number(result["المبلغ بالدولار"]).toLocaleString() : 'غير متوفر';
 
                 resultItem.innerHTML = `
