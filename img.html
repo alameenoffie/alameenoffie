@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرك بحث الديون</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            padding: 20px;
+            position: relative;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100px;
+            height: auto;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .result-item {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .result-item:hover {
+            transform: scale(1.02);
+        }
+        .result-item h3 {
+            color: #4CAF50;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .result-item p {
+            font-size: 14px;
+            color: #555;
+            margin: 4px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #333;
+        }
+        .summary-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .reload-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #4CAF50;
+        }
+        .menu-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            padding: 10px;
+            width: 200px;
+        }
+        .dropdown-menu a {
+            color: #000;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .user-info {
+            text-align: right;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .user-info span {
+            font-size: 12px;
+            color: #4CAF50;
+        }
+        .availability-status {
+            font-size: 10px;
+            background-color: #ddd;
+            color: #555;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .available {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .not-available {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #e0e0e0;
+            color: #555;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .thumbnail {
+            width: 80px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-radius: 5px;
+        }
+        .thumbnail:hover {
+            transform: scale(1.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 600px;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <i class="fas fa-redo-alt reload-icon" onclick="location.reload()"></i>
+    <i class="fas fa-ellipsis-v menu-icon" onclick="toggleMenu()"></i>
+
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="user-info">
+            <i class="fas fa-user"></i>
+            <span>basheer</span>
+        </div>
+        <a href="#">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
+        <a href="#">الديون المستلمة 2023 <span class="availability-status unavailable">غير متوفر</span></a>
+        <a href="#">الديون المستلمة 2022 <span class="availability-status unavailable">غير متوفر</span></a>
+    </div>
+
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h2>البحث في سجل القياسات</h2>
+        <input type="text" id="searchBox" placeholder="اكتب للبحث...">
+        <button onclick="search()">بحث</button>
+
+        <div id="results"></div>
+        <div class="summary-cards" id="debtDisplay" style="display:none;">
+            <div class="card">
+                <h3>المجموع بالدينار</h3>
+                <p id="totalDinar">0 دينار</p>
+            </div>
+            <div class="card">
+                <h3>المجموع بالدولار</h3>
+                <p id="totalDollar">0 دولار</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        let searchResults = [];
+        let debtData = { dinar: 27636000, dollar: 65373 };
+
+        function toggleMenu() {
+            const menu = document.getElementById("dropdownMenu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
+        function loadFixedDebt() {
+            const timestamp = new Date().getTime();
+            const debtFilePath = `dato.xlsx?v=${timestamp}`;
+
+            fetch(debtFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    const debtJson = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (debtJson.length > 0) {
+                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
+                        debtData.dollar = debtJson[0]["دولار"] || 65373;
+                    }
+                })
+                .catch(error => console.error('Error loading the debt Excel file:', error));
+        }
+
+        function loadSearchData() {
+            const timestamp = new Date().getTime();
+            const searchFilePath = `data.xlsx?v=${timestamp}`;
+
+            fetch(searchFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                })
+                .catch(error => console.error('Error loading the search Excel file:', error));
+        }
+
+        function search() {
+            const query = document.getElementById("searchBox").value.toLowerCase();
+            const results = searchResults.filter(result => 
+                (result["القياس"] && result["القياس"].toLowerCase().includes(query)) || 
+                (result["عنوان"] && result["عنوان"].toLowerCase().includes(query))
+            );
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>لا توجد نتائج</p>";
+                return;
+            }
+
+            results.forEach(result => {
+                const resultItem = document.createElement("div");
+                resultItem.classList.add("result-item");
+
+                let receivedDate = result["تاريخ الاستلام"];
+                if (receivedDate) {
+                    const excelDate = Number(receivedDate);
+                    const dateObject = new Date((excelDate - 25569) * 86400 * 1000);
+                    receivedDate = dateObject.toISOString().split('T')[0];
+                } else {
+                    receivedDate = 'غير متوفر';
+                }
+
+                let imageUrl = result["رابط الصورة"] || 'default_image.jpg';
+
+                resultItem.innerHTML = `
+                    <h3>${result["القياس"] || 'غير متوفر'}</h3>
+                    <img src="${imageUrl}" class="thumbnail" onclick="openModal('${imageUrl}')">
+
+                `;
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById("imageModal");
+            const modalImage = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImage.src = imageSrc;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("imageModal");
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("imageModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        function displayDebt() {
+            const totalDinarElement = document.getElementById("totalDinar");
+            const totalDollarElement = document.getElementById("totalDollar");
+            const summaryCards = document.getElementById("debtDisplay");
+
+            totalDinarElement.textContent = `${debtData.dinar.toLocaleString()} دينار`;
+            totalDollarElement.textContent = `${debtData.dollar.toLocaleString()} دولار`;
+
+            summaryCards.style.display = 'flex';
+        }
+
+        window.onload = () => {
+            loadFixedDebt();
+            loadSearchData();
+        };
+    </script>
+</body>
+</html>
