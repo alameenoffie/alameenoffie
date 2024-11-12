@@ -168,7 +168,6 @@
             background-color: #4CAF50;
             color: #fff;
         }
-        /* إضافة الكود الخاص لمربع "غير متوفر" */
         .not-available {
             display: inline-block;
             padding: 4px 8px;
@@ -188,17 +187,17 @@
             <i class="fas fa-user"></i>
             <span>basheer</span>
         </div>
-        <a href="mony2024.html">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
+        <a href="#">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
         <a href="#">الديون المستلمة 2023 <span class="availability-status available">متوفر</span></a>
         <a href="#">الديون المستلمة 2022 <span class="availability-status available">متوفر</span></a>
     </div>
 
     <div class="container">
         <img src="logo.png" alt="Logo" class="logo">
-        <h2>البحث في الديون المستلمة 2024</h2>
+        <h2>البحث في المبالغ المستلمة 2024</h2>
         <input type="text" id="searchBox" placeholder="اكتب للبحث...">
         <button onclick="search()">بحث</button>
-        <button onclick="displayDebt()">عرض مجموع المبالغ 2024</button>
+
 
         <div id="results"></div>
         <div class="summary-cards" id="debtDisplay" style="display:none;">
@@ -216,7 +215,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
         let searchResults = [];
-        let debtData = { dinar: 52923000, dollar: 14900 };
+        let debtData = { dinar: 27636000, dollar: 65373 };
 
         function toggleMenu() {
             const menu = document.getElementById("dropdownMenu");
@@ -236,8 +235,8 @@
                     const debtJson = XLSX.utils.sheet_to_json(worksheet);
 
                     if (debtJson.length > 0) {
-                        debtData.dinar = debtJson[0]["دينار"] || 52923100;
-                        debtData.dollar = debtJson[0]["دولار"] || 14800;
+                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
+                        debtData.dollar = debtJson[0]["دولار"] || 65373;
                     }
                 })
                 .catch(error => console.error('Error loading the debt Excel file:', error));
@@ -245,7 +244,7 @@
 
         function loadSearchData() {
             const timestamp = new Date().getTime();
-            const searchFilePath = `data2.xlsx?v=${timestamp}`;
+            const searchFilePath = `data.xlsx?v=${timestamp}`;
 
             fetch(searchFilePath)
                 .then(response => response.arrayBuffer())
@@ -261,8 +260,8 @@
         function search() {
             const query = document.getElementById("searchBox").value.toLowerCase();
             const results = searchResults.filter(result => 
-                (result["الاسم"] && result["الاسم"].toLowerCase().includes(query)) || 
-                (result["المبلغ بالدولار"] && result["المبلغ بالدولار"].toLowerCase().includes(query))
+                (result["الشخص"] && result["الشخص"].toLowerCase().includes(query)) || 
+                (result["عنوان"] && result["عنوان"].toLowerCase().includes(query))
             );
 
             displayResults(results);
@@ -281,8 +280,8 @@
                 const resultItem = document.createElement("div");
                 resultItem.classList.add("result-item");
 
-				 // تحويل التاريخ إلى صيغة مفهومة
-                let receivedDate = result["التاريخ"];
+                // تحويل التاريخ إلى صيغة مفهومة
+                let receivedDate = result["تاريخ الاستلام"];
                 if (receivedDate) {
                     const excelDate = Number(receivedDate);
                     const dateObject = new Date((excelDate - 25569) * 86400 * 1000);
@@ -290,13 +289,15 @@
                 } else {
                     receivedDate = 'غير متوفر';
                 }
-				
-                resultItem.innerHTML = `
-                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
-                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'}</p>
-                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'}</p>
-                    <p><span class="highlight">التاريخ:</span> ${receivedDate}</p>
 
+                // تنسيق المبالغ بالفواصل
+
+
+                resultItem.innerHTML = `
+                    <h3>${result["الشخص"] || 'غير متوفر'}</h3>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["حساب بالدينار"] || 'غير متوفر'} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["حساب بالدولار"] || 'غير متوفر'} دولار</p>
+                    <p><span class="highlight">التاريخ:</span> ${receivedDate}</p>
                 `;
                 resultsContainer.appendChild(resultItem);
             });
