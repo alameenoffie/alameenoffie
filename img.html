@@ -107,12 +107,21 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .reload-icon {
+        .icons {
             position: absolute;
             top: 20px;
             left: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .icon {
             font-size: 24px;
             cursor: pointer;
+        }
+        .reload-icon {
+            color: #4CAF50;
+        }
+        .home-icon {
             color: #4CAF50;
         }
         .menu-icon {
@@ -176,46 +185,14 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        
-        .thumbnail {
-            width: 80px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            border-radius: 5px;
-        }
-        .thumbnail:hover {
-            transform: scale(1.1);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            padding-top: 60px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 600px;
-        }
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
-    <i class="fas fa-redo-alt reload-icon" onclick="location.reload()"></i>
+    <div class="icons">
+        <i class="fas fa-home home-icon icon" onclick="window.location.href='login.html'"></i> <!-- أيقونة القائمة الرئيسية -->
+        <i class="fas fa-redo-alt reload-icon icon" onclick="location.reload()"></i> <!-- أيقونة إعادة التحميل -->
+    </div>
+    
     <i class="fas fa-ellipsis-v menu-icon" onclick="toggleMenu()"></i>
 
     <div class="dropdown-menu" id="dropdownMenu">
@@ -226,7 +203,7 @@
         <a href="mony2024.html">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
         <a href="#">الديون المستلمة 2023 <span class="availability-status unavailable">غير متوفر</span></a>
         <a href="#">الديون المستلمة 2022 <span class="availability-status unavailable">غير متوفر</span></a>
-		<a href="#">سجل القياسات <span class="availability-status unavailable">تجريبي</span></a>
+        <a href="#">سجل القياسات <span class="availability-status unavailable">تجريبي</span></a>
     </div>
 
     <div class="container">
@@ -246,11 +223,6 @@
                 <p id="totalDollar">0 دولار</p>
             </div>
         </div>
-    </div>
-
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>

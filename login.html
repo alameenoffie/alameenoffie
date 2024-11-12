@@ -107,12 +107,21 @@
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .reload-icon {
+        .icons {
             position: absolute;
             top: 20px;
             left: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .icon {
             font-size: 24px;
             cursor: pointer;
+        }
+        .reload-icon {
+            color: #4CAF50;
+        }
+        .home-icon {
             color: #4CAF50;
         }
         .menu-icon {
@@ -168,7 +177,6 @@
             background-color: #4CAF50;
             color: #fff;
         }
-        /* إضافة الكود الخاص لمربع "غير متوفر" */
         .not-available {
             display: inline-block;
             padding: 4px 8px;
@@ -180,7 +188,11 @@
     </style>
 </head>
 <body>
-    <i class="fas fa-redo-alt reload-icon" onclick="location.reload()"></i>
+    <div class="icons">
+        <i class="fas fa-home home-icon icon" onclick="window.location.href='login.html'"></i> <!-- أيقونة القائمة الرئيسية -->
+        <i class="fas fa-redo-alt reload-icon icon" onclick="location.reload()"></i> <!-- أيقونة إعادة التحميل -->
+    </div>
+    
     <i class="fas fa-ellipsis-v menu-icon" onclick="toggleMenu()"></i>
 
     <div class="dropdown-menu" id="dropdownMenu">
