@@ -185,11 +185,6 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        #error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
@@ -208,7 +203,7 @@
         <a href="mony2024.html">الديون المستلمة 2024 <span class="availability-status available">متوفر</span></a>
         <a href="#">الديون المستلمة 2023 <span class="availability-status unavailable">غير متوفر</span></a>
         <a href="#">الديون المستلمة 2022 <span class="availability-status unavailable">غير متوفر</span></a>
-        <a href="img.html">سجل القياسات <span class="availability-status unavailable">تجريبي</span></a>
+		<a href="img.html">سجل القياسات <span class="availability-status unavailable">تجريبي</span></a>
     </div>
 
     <div class="container">
@@ -217,7 +212,6 @@
         <input type="text" id="searchBox" placeholder="اكتب للبحث...">
         <button onclick="search()">بحث</button>
         <button onclick="displayDebt()">عرض مجموع الديون</button>
-        <p id="error-message" style="display: none;">يرجى إدخال نص للبحث.</p> <!-- الرسالة التنبيهية -->
 
         <div id="results"></div>
         <div class="summary-cards" id="debtDisplay" style="display:none;">
@@ -251,63 +245,83 @@
                 .then(data => {
                     const workbook = XLSX.read(data, { type: "array" });
                     const firstSheet = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[firstSheet];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet);
-                    searchResults = jsonData;
+                    const worksheet = workbook.Sheets[firstSheet];
+                    const debtJson = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (debtJson.length > 0) {
+                        debtData.dinar = debtJson[0]["دينار"] || 27636000;
+                        debtData.dollar = debtJson[0]["دولار"] || 65373;
+                    }
                 })
-                .catch(error => console.error(error));
+                .catch(error => console.error('Error loading the debt Excel file:', error));
+        }
+
+        function loadSearchData() {
+            const timestamp = new Date().getTime();
+            const searchFilePath = `data.xlsx?v=${timestamp}`;
+
+            fetch(searchFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                })
+                .catch(error => console.error('Error loading the search Excel file:', error));
         }
 
         function search() {
-            const searchBox = document.getElementById("searchBox");
-            const query = searchBox.value.trim();
-            const errorMessage = document.getElementById("error-message");
+            const query = document.getElementById("searchBox").value.toLowerCase();
+            const results = searchResults.filter(result => 
+                (result["الاسم"] && result["الاسم"].toLowerCase().includes(query)) || 
+                (result["العنوان"] && result["العنوان"].toLowerCase().includes(query))
+            );
 
-            if (!query) {
-                errorMessage.style.display = "block"; // عرض الرسالة التنبيهية
-                return;
-            } else {
-                errorMessage.style.display = "none"; // إخفاء الرسالة
-            }
-
-            const filteredResults = searchResults.filter(row => {
-                return row['المبلغ بالدينار'] && row['المبلغ بالدينار'].toString().includes(query);
-            });
-
-            displayResults(filteredResults);
+            displayResults(results);
         }
 
         function displayResults(results) {
             const resultsContainer = document.getElementById("results");
             resultsContainer.innerHTML = "";
 
-            if (results.length > 0) {
-                results.forEach(result => {
-                    const resultItem = document.createElement("div");
-                    resultItem.classList.add("result-item");
-                    resultItem.innerHTML = `
-                        <h3>${result['اسم العميل']}</h3>
-                        <p><span class="highlight">المبلغ بالدينار:</span> ${result['المبلغ بالدينار']}</p>
-                        <p><span class="highlight">المبلغ بالدولار:</span> ${result['المبلغ بالدولار']}</p>
-                    `;
-                    resultsContainer.appendChild(resultItem);
-                });
-            } else {
-                resultsContainer.innerHTML = "<p>لا توجد نتائج مطابقة.</p>";
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>لا توجد نتائج</p>";
+                return;
             }
+
+            results.forEach(result => {
+                const resultItem = document.createElement("div");
+                resultItem.classList.add("result-item");
+
+                resultItem.innerHTML = `
+                    <h3>${result["الاسم"] || 'غير متوفر'}</h3>
+                    <p><span class="highlight">التسلسل:</span> ${result["التسلسل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">العنوان:</span> ${result["العنوان"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">السجل:</span> ${result["السجل"] || 'غير متوفر'}</p>
+                    <p><span class="highlight">المبلغ بالدينار:</span> ${result["المبلغ بالدينار"] || 'غير متوفر'} دينار</p>
+                    <p><span class="highlight">المبلغ بالدولار:</span> ${result["المبلغ بالدولار"] || 'غير متوفر'} دولار</p>
+                    <p><span class="highlight">المبلغ المتبقي:</span> ${result["المبلغ المتبقي"] ? result["المبلغ المتبقي"] : '<span class="not-available">لايوجد</span>'}</p>
+                `;
+                resultsContainer.appendChild(resultItem);
+            });
         }
 
         function displayDebt() {
-            const debtContainer = document.getElementById("debtDisplay");
-            const totalDinar = document.getElementById("totalDinar");
-            const totalDollar = document.getElementById("totalDollar");
+            const totalDinarElement = document.getElementById("totalDinar");
+            const totalDollarElement = document.getElementById("totalDollar");
+            const summaryCards = document.getElementById("debtDisplay");
 
-            debtContainer.style.display = "flex";
-            totalDinar.innerText = `${debtData.dinar} دينار`;
-            totalDollar.innerText = `${debtData.dollar} دولار`;
+            totalDinarElement.textContent = `${debtData.dinar.toLocaleString()} دينار`;
+            totalDollarElement.textContent = `${debtData.dollar.toLocaleString()} دولار`;
+
+            summaryCards.style.display = 'flex';
         }
 
-        loadFixedDebt();
+        window.onload = () => {
+            loadFixedDebt();
+            loadSearchData();
+        };
     </script>
 </body>
 </html>
